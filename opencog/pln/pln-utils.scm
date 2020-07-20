@@ -123,7 +123,7 @@
         2. 'standard
 
       The 'empty rule base contains no rule. In such case rules can be
-      added using pln-add-rule-by-name or pln-add-rules-by-names.
+      added using pln-add-rule or pln-add-rules.
 
       The 'standard rule base contains a few dozens of rules, such as
       deduction, modus ponens, contraposition, fuzzy conjunction and
@@ -133,10 +133,12 @@
         (pln-weighted-rules)
 
       Also, rules can be added or subtracted using the functions
-      pln-add-rule-by-name, pln-add-rules-by-names,
-      pln-rm-rule-by-name and pln-rm-rules-by-names.
+      pln-add-rule, pln-add-rules, pln-rm-rule and pln-rm-rules.
 "
   (define rule-base (if (< 0 (length rule-bases)) (car rule-bases) 'standard))
+
+  ;; Clear PLN atomspace
+  (pln-clear)
 
   ;; Load rule files
   (pln-load-rules "term/deduction")
@@ -148,6 +150,9 @@
   (pln-load-rules "propositional/fuzzy-disjunction-introduction")
   (pln-load-rules "extensional/extensional-similarity-direct-introduction")
   (pln-load-rules "extensional/subset-direct-introduction")
+  (pln-load-rules "extensional/conjunction-direct-introduction")
+  (pln-load-rules "extensional/concept-direct-evaluation")
+  (pln-load-rules "extensional/member-deduction")
   (pln-load-rules "intensional/attraction-introduction")
   (pln-load-rules "intensional/intensional-inheritance-direct-introduction")
   (pln-load-rules "intensional/intensional-similarity-direct-introduction")
@@ -163,39 +168,39 @@
                     ((equal? rule-base 'standard)
                      (list
                       ;; Deduction
-                      "deduction-implication-rule"
-                      "deduction-subset-rule"
-                      "deduction-inheritance-rule"
+                      'deduction-implication
+                      'deduction-subset
+                      'deduction-inheritance
 
                       ;; Modus Ponens
-                      "modus-ponens-inheritance-rule"
-                      "modus-ponens-implication-rule"
-                      "modus-ponens-subset-rule"
+                      'modus-ponens-inheritance
+                      'modus-ponens-implication
+                      'modus-ponens-subset
 
                       ;; Contraposition
-                      "crisp-contraposition-implication-scope-rule"
-                      "contraposition-implication-rule"
-                      "contraposition-inheritance-rule"
+                      'crisp-contraposition-implication-scope
+                      'contraposition-implication
+                      'contraposition-inheritance
 
                       ;; Fuzzy Conjunction Introduction
-                      "fuzzy-conjunction-introduction-1ary-rule"
-                      "fuzzy-conjunction-introduction-2ary-rule"
-                      "fuzzy-conjunction-introduction-3ary-rule"
-                      "fuzzy-conjunction-introduction-4ary-rule"
-                      "fuzzy-conjunction-introduction-5ary-rule"
+                      'fuzzy-conjunction-introduction-1ary
+                      'fuzzy-conjunction-introduction-2ary
+                      'fuzzy-conjunction-introduction-3ary
+                      'fuzzy-conjunction-introduction-4ary
+                      'fuzzy-conjunction-introduction-5ary
 
                       ;; Fuzzy Disjunction Introduction
-                      "fuzzy-disjunction-introduction-1ary-rule"
-                      "fuzzy-disjunction-introduction-2ary-rule"
-                      "fuzzy-disjunction-introduction-3ary-rule"
-                      "fuzzy-disjunction-introduction-4ary-rule"
-                      "fuzzy-disjunction-introduction-5ary-rule"
+                      'fuzzy-disjunction-introduction-1ary
+                      'fuzzy-disjunction-introduction-2ary
+                      'fuzzy-disjunction-introduction-3ary
+                      'fuzzy-disjunction-introduction-4ary
+                      'fuzzy-disjunction-introduction-5ary
 
                       ;; Conditional Full Instantiation
-                      "conditional-full-instantiation-implication-scope-meta-rule"
-                      "conditional-full-instantiation-implication-meta-rule"
-                      "conditional-full-instantiation-inheritance-meta-rule")))))
-    (pln-add-rules-by-names rlst))
+                      'conditional-full-instantiation-implication-scope-meta
+                      'conditional-full-instantiation-implication-meta
+                      'conditional-full-instantiation-inheritance-meta)))))
+    (pln-add-rules rlst))
 
   ;; Avoid confusing the user with a return value
   *unspecified*)
@@ -245,34 +250,35 @@
 
   *unspecified*)
 
-(define-public (pln-add-rule-by-name rule-name . tv)
+(define-public (pln-add-rule rule . tv)
 "
-  Call ure-add-rule-by-name on the PLN rule base. See
+  Call ure-add-rule on the PLN rule base. See
 
-    (help ure-add-rule-by-name)
+    (help ure-add-rule)
 
   for more info.
 "
   (define current-as (cog-set-atomspace! pln-atomspace))
-  (apply ure-add-rule-by-name (cons (pln-mk-rb) (cons rule-name tv)))
+  (apply ure-add-rule (cons (pln-mk-rb) (cons rule tv)))
   (cog-set-atomspace! current-as)
 
   *unspecified*)
 
-(define-public (pln-add-rules-by-names rule-names)
+(define-public (pln-add-rules rules)
 "
-  Call ure-add-rules-by-names on the PLN rule base. See
+  Call ure-add-rules on the PLN rule base. See
 
-    (help ure-add-rules-by-names)
+    (help ure-add-rules)
 
   for more info.
 "
   (define current-as (cog-set-atomspace! pln-atomspace))
-  (ure-add-rules-by-names (pln-mk-rb) rule-names)
+  (ure-add-rules (pln-mk-rb) rules)
   (cog-set-atomspace! current-as)
 
   *unspecified*)
 
+;; TODO: use pln-rm-rule once generalized
 (define-public (pln-rm-rule-by-name rule-name)
 "
   Call ure-rm-rule-by-name on the PLN rule base. See
@@ -311,7 +317,7 @@
 "
   (ure-rm-all-rules (pln-rb)))
 
-(define (pln-set-attention-allocation value)
+(define-public (pln-set-attention-allocation value)
 "
   Wrapper around ure-set-attention-allocation using (pln-rb) as rule base.
 
@@ -319,7 +325,7 @@
 "
   (ure-set-attention-allocation (pln-rb) value))
 
-(define (pln-set-maximum-iterations rbs value)
+(define-public (pln-set-maximum-iterations value)
 "
   Wrapper around ure-set-maximum-iterations using (pln-rb) as rule base.
 
@@ -327,7 +333,7 @@
 "
   (ure-set-maximum-iterations (pln-rb) value))
 
-(define (pln-set-complexity-penalty rbs value)
+(define-public (pln-set-complexity-penalty value)
 "
   Wrapper around ure-set-complexity-penalty using (pln-rb) as rule base.
 
@@ -335,7 +341,7 @@
 "
   (ure-set-complexity-penalty (pln-rb) value))
 
-(define (pln-set-jobs rbs value)
+(define-public (pln-set-jobs value)
 "
   Wrapper around ure-set-jobs using (pln-rb) as rule base.
 
@@ -343,7 +349,7 @@
 "
   (ure-set-jobs (pln-rb) value))
 
-(define (pln-set-fc-retry-exhausted-sources rbs value)
+(define-public (pln-set-fc-retry-exhausted-sources value)
 "
   Wrapper around ure-set-fc-retry-exhausted-sources using (pln-rb) as rule base.
 
@@ -351,7 +357,7 @@
 "
   (ure-set-fc-retry-exhausted-sources (pln-rb) value))
 
-(define (pln-set-fc-full-rule-application rbs value)
+(define-public (pln-set-fc-full-rule-application value)
 "
   Wrapper around ure-set-fc-full-rule-application using (pln-rb) as rule base.
 
@@ -359,7 +365,7 @@
 "
   (ure-set-fc-full-rule-application (pln-rb) value))
 
-(define (pln-set-bc-maximum-bit-size rbs value)
+(define-public (pln-set-bc-maximum-bit-size value)
 "
   Wrapper around ure-set-bc-maximum-bit-size using (pln-rb) as rule base.
 
@@ -367,7 +373,7 @@
 "
   (ure-set-bc-maximum-bit-size (pln-rb) value))
 
-(define (pln-set-bc-mm-complexity-penalty rbs value)
+(define-public (pln-set-bc-mm-complexity-penalty value)
 "
   Wrapper around ure-set-bc-mm-complexity-penalty using (pln-rb) as rule base.
 
@@ -375,7 +381,7 @@
 "
   (ure-set-bc-mm-complexity-penalty (pln-rb) value))
 
-(define (pln-set-bc-mm-compressiveness rbs value)
+(define-public (pln-set-bc-mm-compressiveness value)
 "
   Wrapper around ure-set-bc-mm-compressiveness using (pln-rb) as rule base.
 
@@ -399,12 +405,23 @@
 "
   (apply cog-bc (cons (pln-rb) args)))
 
-;; TODO: maybe move to ure as well
-(define-public (pln-execute-rule-by-name rule-name)
+;; TODO: move to ure
+(define-public (pln-apply-rule rule-symbol)
 "
-  Execute a rule given its name, for instance
+  Execute a rule symbol, for instance
 
-  (pln-execute-rule-by-name \"deduction-subset-rule\")
+  (pln-apply-rule 'subset-deduction)
 "
   ;; TODO
 )
+
+(define-public (pln-clear)
+  ;; Switch to PLN atomspace and clear
+  (define current-as (cog-set-atomspace! pln-atomspace))
+  (clear)
+
+  ;; Switch back to previous space
+  (cog-set-atomspace! current-as)
+
+  ;; Avoid confusing the user with a return value
+  *unspecified*)
