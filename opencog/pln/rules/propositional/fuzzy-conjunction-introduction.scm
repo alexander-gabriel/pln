@@ -22,11 +22,16 @@
   (let* ((variables (gen-variables "$X" nary))
          (EvaluationT (Type "EvaluationLink"))
          (InheritanceT (Type "InheritanceLink"))
+         (IdenticalT (Type "IdenticalLink"))
+         (PresentT (Type "PresentLink"))
+         (AbsentT (Type "AbsentLink"))
+         (StateT (Type "StateLink"))
+         (ExistsT (Type "ExistsLink"))
          (OrT (Type "OrLink"))
          (NotT (Type "NotLink"))
          (ExecutionT (Type "ExecutionLink"))
          ;; Not AndLink because we'd rather have that already flattened
-         (type (TypeChoice EvaluationT InheritanceT OrT NotT ExecutionT))
+         (type (TypeChoice ExistsT IdenticalT StateT PresentT AbsentT EvaluationT InheritanceT OrT NotT ExecutionT))
          (gen-typed-variable (lambda (x) (TypedVariable x type)))
          (vardecl (VariableList (map gen-typed-variable variables)))
          (pattern (Present variables))
@@ -76,3 +81,39 @@
 (DefineLink
   fuzzy-conjunction-introduction-5ary-rule-name
   (gen-fuzzy-conjunction-introduction-rule 5))
+(define fuzzy-conjunction-introduction-6ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-6ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-6ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 6))
+(define fuzzy-conjunction-introduction-7ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-7ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-7ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 7))
+(define fuzzy-conjunction-introduction-8ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-8ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-8ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 8))
+(define fuzzy-conjunction-introduction-9ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-9ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-9ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 9))
+
+(define fuzzy-conjunction-introduction-10ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-10ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-10ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 10))
+(define fuzzy-conjunction-introduction-11ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-11ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-11ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 11))
+(define fuzzy-conjunction-introduction-12ary-rule-name
+  (DefinedSchema "fuzzy-conjunction-introduction-12ary-rule"))
+(DefineLink
+  fuzzy-conjunction-introduction-12ary-rule-name
+  (gen-fuzzy-conjunction-introduction-rule 12))
